@@ -1,8 +1,15 @@
 Tên môn: Cấu trúc dữ liệu và giải thuật
-Thời gian học: T2(6-7.5)
-Họ tên sinh viên: Lê Hồ Quốc Thịnh - 25120442
-                  Cao Bá Nhựt - 25120406
-                  Nguyễn Tiến Phát - 25120408
+
+Thời gian học: HK2 2025-2026
+
+Họ tên sinh viên: 
+
+Lê Hồ Quốc Thịnh - 25120442
+
+Cao Bá Nhựt - 25120406
+
+Nguyễn Tiến Phát - 25120408
+
 A. Integer Sort
 
 Thuật toán tốt nhất ở lần chạy đầu tiên: 
