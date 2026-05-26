@@ -93,9 +93,9 @@ I. Bài A: Integer Sort
 •	Test 005: Sử dụng hai mặt nạ bit luân phiên là 0xAAAAAAAA (dãy bit 101010...) và 0x55555555 (dãy bit 010101...). Mỗi giá trị được XOR thêm với một số ngẫu nhiên nhỏ (từ 0 đến 99) để tạo nhiễu.
 2. Các thuật toán mục tiêu mà bộ test này nhắm tới
 Bộ test này không nhắm vào một thuật toán duy nhất mà là một màng lọc để gây khó khăn các nhóm thuật toán sắp xếp phổ biến nhưng cài đặt thiếu tối ưu, bao gồm:
-1.	Quicksort cơ bản (Naive Quicksort): Các phiên bản Quicksort chọn chốt (pivot) cố định (như phần tử đầu, phần tử cuối, hoặc phần tử ở giữa) và chỉ phân hoạch làm 2 phần (2-way partitioning).
-2.	Counting Sort / Bucket Sort cơ bản: Thuật toán sắp xếp dựa trên việc đếm tần số xuất hiện của các phần tử và cấp phát mảng phụ dựa trên khoảng giá trị (Max - Min).
-3.	Radix Sort cơ bản: Thuật toán sắp xếp theo cơ số (thường là cơ số 10 hoặc cơ số 2) mà không tối ưu hóa bộ nhớ đệm (cache).
+•	Quicksort cơ bản (Naive Quicksort): Các phiên bản Quicksort chọn chốt (pivot) cố định (như phần tử đầu, phần tử cuối, hoặc phần tử ở giữa) và chỉ phân hoạch làm 2 phần (2-way partitioning).
+•	Counting Sort / Bucket Sort cơ bản: Thuật toán sắp xếp dựa trên việc đếm tần số xuất hiện của các phần tử và cấp phát mảng phụ dựa trên khoảng giá trị (Max - Min).
+•	Radix Sort cơ bản: Thuật toán sắp xếp theo cơ số (thường là cơ số 10 hoặc cơ số 2) mà không tối ưu hóa bộ nhớ đệm (cache).
 3. Lý do chọn các thuật toán mục tiêu này
 Trong các bài toán Benchmark (đánh giá hiệu năng) với giới hạn thời gian và bộ nhớ gắt gao:
 •	Quicksort luôn là lựa chọn đầu tiên của mọi người (hoặc dùng thẳng hàm std::sort trong các ngôn ngữ lập trình). Việc nhắm vào Quicksort là để kiểm tra xem người viết có hiểu về các trường hợp xấu nhất (Worst-case) của chia để trị hay không.
@@ -119,10 +119,10 @@ Mã nguồn sử dụng một hàm sinh số ngẫu nhiên tùy chỉnh my_rand(
 •	Test 005 (Sắp xếp ngược toàn cục): Sử dụng chung tiền tố 95 ký tự 'x'. Vòng lặp chạy lùi từ N-1 về 0 để tạo ra các hậu tố giảm dần. Kết quả là toàn bộ mảng 10^5 phần tử được sắp xếp theo thứ tự giảm dần nghiêm ngặt.
 2. Các thuật toán mục tiêu mà bộ test này nhắm tới
 Bộ test benchmark này được thiết kế như một "màng lọc" để bẻ gãy các phương pháp giải quyết sau:
-1.	Quicksort cơ bản (Cài đặt thủ công): Sử dụng cơ chế chọn chốt (pivot) ngây thơ (chọn phần tử đầu, cuối, hoặc giữa) và chỉ phân hoạch 2 phần (2-way partitioning).
-2.	std::sort mặc định kết hợp với toán tử < của std::string: Thuật toán IntroSort chuẩn của C++ chưa được tinh chỉnh đặc thù cho chuỗi ký tự.
-3.	Các thuật toán thiếu nhận thức về Tiền tố chung (LCP - Longest Common Prefix): Bất kỳ thuật toán sắp xếp dựa trên so sánh nào coi việc so sánh 2 chuỗi luôn tốn O(1) thời gian.
-4.	Các thuật toán sao chép chuỗi sâu (Deep Copying): Cài đặt thao tác hoán vị (Swap) bằng cách tạo bản sao chuỗi thay vì tráo đổi con trỏ bộ nhớ (đặc biệt chí mạng vì chuỗi có độ dài 100 vượt qua ngưỡng Small String Optimization - SSO của C++).
+•	Quicksort cơ bản (Cài đặt thủ công): Sử dụng cơ chế chọn chốt (pivot) ngây thơ (chọn phần tử đầu, cuối, hoặc giữa) và chỉ phân hoạch 2 phần (2-way partitioning).
+•	std::sort mặc định kết hợp với toán tử < của std::string: Thuật toán IntroSort chuẩn của C++ chưa được tinh chỉnh đặc thù cho chuỗi ký tự.
+•	Các thuật toán thiếu nhận thức về Tiền tố chung (LCP - Longest Common Prefix): Bất kỳ thuật toán sắp xếp dựa trên so sánh nào coi việc so sánh 2 chuỗi luôn tốn O(1) thời gian.
+•	Các thuật toán sao chép chuỗi sâu (Deep Copying): Cài đặt thao tác hoán vị (Swap) bằng cách tạo bản sao chuỗi thay vì tráo đổi con trỏ bộ nhớ (đặc biệt chí mạng vì chuỗi có độ dài 100 vượt qua ngưỡng Small String Optimization - SSO của C++).
 3. Lý do chọn các thuật toán mục tiêu này
 Trong một thử thách về hiệu năng:
 •	Kiểm tra kiến thức thực tế về String: Mọi người thường lầm tưởng độ phức tạp của bài toán sắp xếp chuỗi là O(N \log N). Thực tế, chi phí so sánh 2 chuỗi là O(L) với L là độ dài tiền tố giống nhau. Thuật toán mục tiêu số 2 và 3 được chọn để trừng phạt lỗ hổng kiến thức này.
@@ -149,10 +149,10 @@ III. Bài C: Length-aware Lexicographic Sort
 •	Test 005 (Độ dài đan xen/Ziczac): Mảng được lấp đầy bởi các cặp chuỗi đan xen liên tục: một chuỗi cực dài (100 ký tự 'z') đi kèm ngay sau là một chuỗi cực ngắn (10 ký tự 'a').
 2. Các thuật toán mục tiêu mà bộ test này nhắm tới
 Vì bài toán yêu cầu sắp xếp theo 2 tiêu chí ưu tiên (Độ dài \rightarrow Thứ tự từ điển), bộ test này được thiết kế để trừng phạt các cách cài đặt ngây thơ sau:
-1.	Custom Comparator thiếu tối ưu: Sử dụng hàm so sánh tùy chỉnh bool cmp(string a, string b) gọi a.length() < b.length() sau đó return a < b và truyền trực tiếp vào std::sort.
-2.	Bucket Sort cục bộ: Thuật toán chia dữ liệu vào các giỏ (bucket) theo độ dài (từ 10 đến 100), sau đó dùng một thuật toán sắp xếp yếu (như Bubble Sort, Insertion Sort, hoặc Quicksort cơ bản) để sort từng giỏ.
-3.	Thuật toán so sánh không nhận thức được Tiền tố chung (LCP): Bỏ qua thực tế rằng việc so sánh hai chuỗi dài có phần đầu giống nhau sẽ tiêu tốn độ phức tạp O(L), với L là chiều dài tiền tố chung.
-4.	Cài đặt hoán vị bằng Deep Copy: Cài đặt hàm swap bằng cách gán giá trị (copy object) thay vì tráo đổi con trỏ, gây tràn băng thông bộ nhớ khi xử lý các chuỗi dài 100 ký tự.
+•	Custom Comparator thiếu tối ưu: Sử dụng hàm so sánh tùy chỉnh bool cmp(string a, string b) gọi a.length() < b.length() sau đó return a < b và truyền trực tiếp vào std::sort.
+•	Bucket Sort cục bộ: Thuật toán chia dữ liệu vào các giỏ (bucket) theo độ dài (từ 10 đến 100), sau đó dùng một thuật toán sắp xếp yếu (như Bubble Sort, Insertion Sort, hoặc Quicksort cơ bản) để sort từng giỏ.
+•	Thuật toán so sánh không nhận thức được Tiền tố chung (LCP): Bỏ qua thực tế rằng việc so sánh hai chuỗi dài có phần đầu giống nhau sẽ tiêu tốn độ phức tạp O(L), với L là chiều dài tiền tố chung.
+•	Cài đặt hoán vị bằng Deep Copy: Cài đặt hàm swap bằng cách gán giá trị (copy object) thay vì tráo đổi con trỏ, gây tràn băng thông bộ nhớ khi xử lý các chuỗi dài 100 ký tự.
 3. Lý do chọn các thuật toán mục tiêu này
 •	Sàng lọc thói quen lạm dụng Thư viện: Đa số mọi người khi gặp bài toán nhiều tiêu chí sẽ lập tức viết Custom Comparator. Tuy nhiên, họ hiếm khi nhận thức được các chi phí chìm (Hidden Costs) bên trong hàm này khi xử lý với số lượng dữ liệu lớn. Nhắm vào mục tiêu 1 để đánh giá khả năng tối ưu hóa cấp độ vi kiến trúc (micro-architecture).
 •	Đánh giá tư duy phân tích Worst-case: Nhóm các chuỗi theo độ dài (Bucket Sort) là một hướng đi thông minh. Tuy nhiên, nhắm vào mục tiêu 2 nhằm kiểm tra xem lập trình viên có lường trước được trường hợp dữ liệu bị "nhồi" toàn bộ vào một giỏ duy nhất hay không.
@@ -164,5 +164,6 @@ Sự kết hợp giữa đặc tính độ dài và cấu trúc dữ liệu tron
 •	Test 003 (Sát thủ tráo đổi): Với thứ tự chiều dài giảm dần nghiêm ngặt toàn mảng, mọi thuật toán có thiên hướng duyệt và đổi chỗ tuần tự (Insertion/Bubble) sẽ phải thực hiện O(N^2) lần hoán vị (Swap). Nếu dùng Deep Copy, bộ nhớ sẽ bị quá tải nặng nề.
 •	Test 004 (Bẫy Insertion Sort cục bộ): Tại các khối kích thước \le 32, các thư viện chuẩn (IntroSort) thường kích hoạt Insertion Sort. Việc mảng bị nghịch thế (giảm dần) cục bộ kết hợp với tiền tố chung 99 ký tự bắt CPU phải so sánh và dịch chuyển bộ nhớ liên tục trong không gian hẹp, gây dội Cache (Cache Thrashing).
 •	Test 005 (Phá vỡ Bộ dự đoán rẽ nhánh - Branch Predictor): Test case này không tấn công vào số lượng phép toán, mà tấn công thẳng vào phần cứng CPU. Câu lệnh if (a.length() < b.length()) sẽ trả về kết quả True - False xen kẽ liên tục (T-F-T-F...). Pipeline của CPU hiện đại sẽ không thể dự đoán được nhánh mã tiếp theo, dẫn đến việc phải xóa toàn bộ luồng lệnh hàng vạn lần, làm thời gian thực thi có thể tăng gấp 3 đến 5 lần so với dữ liệu ngẫu nhiên thông thường.
+
 
 
