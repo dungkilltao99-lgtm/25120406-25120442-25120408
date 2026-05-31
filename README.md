@@ -234,4 +234,78 @@ Sự kết hợp giữa đặc tính độ dài và cấu trúc dữ liệu tron
 
 ## A. Integer Sort
 
+# 1. Thuật toán cài đặt tốt nhất:
 
+Khi đối mặt với bài toán sắp xếp một mảng số nguyên lớn (đặc biệt là trong lập trình thi đấu hoặc xử lý dữ liệu lớn), đây là 3 lựa chọn hàng đầu:Radix Sort (Cơ số 2^{16} = 65536): Đây chính là thuật toán bạn đang dùng. Với số nguyên 32-bit, chia làm 2 lượt đi (2 passes), độ phức tạp là O(N). Nó nhanh hơn rất nhiều so với các thuật toán dựa trên phép so sánh khi N lớn, vì số lượt duyệt cố định là 2 thay vì \log N.std::sort (Introsort - Kết hợp giữa Quick Sort, Heap Sort và Insertion Sort): Thuật toán mặc định của C++. Độ phức tạp O(N \log N). Dù về mặt lý thuyết chậm hơn Radix Sort, nhưng nhờ các công nghệ tối ưu hóa nội tại của compiler (như SIMD, loop unrolling), std::sort vẫn chạy cực kỳ nhanh và là lựa chọn "an toàn" nhất nếu không muốn tự cài đặt.Counting Sort: Độ phức tạp O(N + K) với K là khoảng giá trị của phần tử. Thuật toán này chỉ tốt nhất khi giá trị các phần tử nhỏ (ví dụ A_i \le 10^6). Nếu khoảng giá trị rộng (từ -2 \cdot 10^9 đến 2 \cdot 10^9), Counting Sort hoàn toàn bất khả thi vì tràn bộ nhớ.Kết luận cho Mục 1: Lựa chọn Radix Sort với cơ số 65536 của bạn là tối ưu nhất về mặt tốc độ lý thuyết cho một mảng số nguyên 32-bit ngẫu nhiên diện rộng.
+
+# 2. Các phương thức liên quan đến thuật toán chính (Radix Sort):
+Để Radix Sort chạy mượt mà với số nguyên có dấu (signed int), hàm radixSort của bạn phối hợp các kỹ thuật sau:Phép biến đổi Bit Biểu diễn (a[i] ^= 0x80000000): Bản chất của số nguyên có dấu trong máy tính dùng mã bù 2, khiến số âm có bit cao nhất (bit dấu) là 1, còn số dương là 0. Phép ^= 0x80000000 sẽ đảo ngược bit dấu này, biến các số âm thành các số "nhỏ hơn" số dương trong hệ không dấu (unsigned), giúp thuật toán sắp xếp đúng thứ tự. Cuối hàm ta chỉ cần đảo lại một lần nữa.Mảng đếm tần suất (count1, count2 kích thước 65536): Thay vì đếm từng chữ số hệ 10, ta đếm theo cụm 16 bit. 2^{16} = 65536, vừa vặn với một mảng kích thước nhỏ, tối ưu bộ nhớ cache của CPU.Kỹ thuật lấy 16 bit thấp và 16 bit cao:Lượt 1: a[i] & 0xFFFF để trích xuất 16 bit cuối.Lượt 2: (b[i] >> 16) & 0xFFFF để dịch phải và lấy 16 bit đầu.Mảng cộng dồn (Prefix Sum) và phân phối ngược: Tính vị trí bắt đầu của các nhóm số và duyệt ngược từ n - 1 về 0 để đảm bảo tính ổn định (stable sort) của thuật toán.
+
+# 3. tối ưu tiếp tục so với lần 1:
+# + Quản lý bộ nhớ (Mảng dữ liệu): 
+    - Bài cũ: Cấp phát động: new int[n]
+    - Bài mới: Mảng toàn cục cố định: int data_arr[100005]
+    - Đánh giá: Bài cũ linh hoạt hơn! Bài mới bị giới hạn cứng N≤105. Nếu đề bài cho N=106, bài mới sẽ bị lỗi tràn mảng (Runtime Error) ngay lập tức.
+# + An toàn phép dịch bit:
+    - Bài cũ: Thao tác trực tiếp trên int có dấu.
+    - Bài mới: Ép kiểu sang unsigned int*.
+    - Đánh giá: Bài mới xuất sắc! Dịch phải (>>) trên số int có dấu có thể kích hoạt arithmetic shift (giữ lại bit dấu), gây sai số. Ép sang unsigned int đảm bảo luôn là logical shift (điền số 0 vào bên trái).
+# + Xử lý tràn số khi in/đọc số âm:
+    - Bài cũ: Dùng int: x = -x;
+    - Bài mới: Dùng long long: lx = -lx;
+    - Đánh giá: Bài mới sửa lỗi chí mạng! Ở bài cũ, nếu số đầu vào là INT_MIN (−2147483648), phép x = -x sẽ gây tràn số nghiêm trọng vì số dương lớn nhất chỉ là 2147483647. Bài mới dùng long long đã triệt tiêu hoàn toàn lỗi này.
+# + Tốc độ thực thi:
+    - Bài cũ: Khá nhanh.
+    - Bài mới: Nhanh hơn một chút ở khâu I/O.
+    - Đánh giá: Việc khai báo mảng toàn cục (bản mới) giúp tiết kiệm vài mili-giây cấp phát vùng nhớ Heap so với  (bản cũ).
+ 
+## B: Lexicographic Sort
+
+# 1. Thuật toán cài đặt tốt nhất:
+Khác với sắp xếp số nguyên, sắp xếp chuỗi có đặc thù là phép so sánh tốn chi phí tỷ lệ thuận với độ dài chuỗi (O(L)). Dưới đây là các thuật toán hàng đầu:MSD Radix Sort (Sắp xếp theo cơ số từ trái sang phải): Đây là thuật toán bạn đang sử dụng và cũng là lựa chọn tối ưu nhất cho dữ liệu chuỗi lớn. Nó nhóm các chuỗi theo ký tự đầu tiên, sau đó đệ quy xuống để sắp xếp theo các ký tự tiếp theo. Độ phức tạp là O(W \cdot N), với W là độ dài trung bình để phân biệt các chuỗi. Burstsort / Trie Sort: Thay vì chia mảng, thuật toán này đưa các chuỗi vào một cấu trúc dữ liệu dạng cây (Trie). Burstsort là phiên bản tối ưu cache của Trie Sort và hiện được coi là thuật toán sắp xếp chuỗi nhanh nhất thế giới trên thực tế. Tuy nhiên, nó cực kỳ phức tạp để tự cài đặt trong các kỳ thi.3-way Radix Quicksort (Quicksort 3 phân thủy): Lai giữa Quicksort và MSD Radix Sort. Ở mỗi bước, nó chọn một ký tự pivot và chia mảng làm 3 phần: nhỏ hơn, bằng, và lớn hơn pivot. Rất phù hợp nếu các chuỗi có nhiều tiền tố chung dài, tránh được chi phí tạo mảng tần suất của Radix Sort.std::sort (C++): Sử dụng std::sort kết hợp với std::string. Độ phức tạp là O(N \log N \cdot L). Chậm hơn đáng kể vì cache miss và chi phí cấp phát bộ nhớ (allocation) của std::string nếu không được tối ưu.Kết luận: MSD Radix Sort là thuật toán "công thủ toàn diện", cực kỳ xuất sắc cho bài toán này, đặc biệt khi bạn đã kết hợp nó với Custom I/O.
+
+# 2. Các phương thức liên quan đến thuật toán chính (MSD Radix Sort):
+Để MSD Radix Sort đạt tốc độ bàn thờ và không bị lỗi, code của bạn đã áp dụng một loạt các kỹ thuật lõi sau:Nhóm theo ký tự (Bucketing): Đếm tần suất (Counting Sort) ký tự tại vị trí d (index d). Dựa vào tần suất, thuật toán chia mảng thành các phân nhóm (buckets).Ký tự Null (\0): Khi một chuỗi ngắn hơn chuỗi khác (ví dụ "abc" và "abcd"), chuỗi ngắn phải đứng trước. Việc gán giá trị kết thúc chuỗi \0 vào vị trí bucket đầu tiên (index 0) xử lý hoàn hảo trường hợp này.Chuyển đổi chiến thuật (Fallback to Insertion Sort): Đây là tối ưu quan trọng nhất của thuật toán. Khi một nhóm đệ quy có số lượng phần tử quá nhỏ (code bạn chọn N \le 16), overhead (chi phí) của việc khởi tạo mảng tần suất (count) lớn hơn nhiều so với việc sắp xếp so sánh. Việc chuyển sang Insertion Sort giúp thuật toán chạy nhanh hơn 15% - 20%.Cấu trúc dữ liệu Memory Pool: Thay vì cấp phát hàng vạn std::string nằm rải rác trong Heap, bạn ném toàn bộ ký tự vào một mảng 1 chiều khổng lồ (pool). Các đối tượng Ref (hoặc StringRef) chỉ lưu con trỏ (char*) trỏ vào mảng đó. Điều này giúp tối đa hóa tốc độ đọc của Cache L1/L2 trên CPU.
+
+# 3. tối ưu tiếp tục so với lần 1:
+# + Kích thước bảng chữ cái (Alphabet Size): 
+    - Bài cũ: 256 (Toàn bộ bảng mã ASCII).
+    - Bài mới: 27 (Chỉ chữ cái thường 'a'-'z' và \0).
+    - Đánh giá: Bài mới chạy nhanh hơn rất nhiều! Mỗi lần đệ quy, bài cũ phải cấp phát và duyệt mảng kích thước 256. Bài mới chỉ duyệt 27. Tuy nhiên, bài mới sẽ sai nếu input có chữ hoa, số hoặc ký tự đặc biệt.
+# + Quản lý bộ nhớ:
+    - Bài cũ: Dùng new cấp phát động theo N.
+    - Bài mới: Dùng mảng hằng số toàn cục POOL_SIZE = 11000000, MAX_N = 100000.
+    - Đánh giá: Tương tự bài số nguyên. Bài mới loại bỏ được thời gian xin cấp bộ nhớ của HĐH (rất nhanh), nhưng bị khóa cứng giới hạn dữ liệu. Bạn phải tự đảm bảo tổng số ký tự không vượt 11 triệu.
+# + Hàm so sánh (Fallback):
+    - Bài cũ: Tận dụng thư viện <cstring>: strcmp.
+    - Bài mới: Tự viết tay hoàn toàn: lessStr và insertionSort.
+    - Đánh giá: Bài mới linh hoạt hơn. Việc viết hàm lessStr có thêm tham số d giúp nó bỏ qua việc so sánh lại từ đầu những tiền tố (prefix) đã được đảm bảo là giống nhau ở các vòng đệ quy trước, tối ưu hơn strcmp thông thường một chút.
+# + Tối ưu vòng lặp chia Bucket:
+    - Bài cũ: Duyệt qua chuỗi, tính toán end - start > 1.
+    - Bài mới: Lưu sẵn vị trí mảng pos[27] và cur[27].
+    - Đánh giá: Bài mới viết code "sạch" và tiêu chuẩn hơn. Logic lưu vị trí đầu vào của bucket (pos[i]) giúp tránh phải thao tác tính toán offset nhọc nhằn, dễ debug hơn hẳn so với bài cũ.
+
+## C. Length-aware Lexicographic String Sort
+# 1. Các thuật toán tốt nhất:
+Lựa chọn tốt nhất:Length-Bucketing + MSD Radix Sort: Đây chính là chiến thuật của Bài cũ. Nó cực kỳ tối ưu vì nhóm các chuỗi cùng chiều dài lại với nhau bằng Counting Sort (độ phức tạp O(N)), sau đó chỉ chạy Radix Sort trên các chuỗi có cùng chiều dài. Không có thuật toán so sánh nào có thể vượt qua cách này về mặt tốc độ.std::sort với Custom Comparator: Dùng hàm std::sort có sẵn của C++ kết hợp với hàm so sánh tùy chỉnh (giống hàm isSmaller của bạn). Thuật toán bên dưới là Introsort (chạy cực nhanh, không tốn thêm bộ nhớ). Độ phức tạp O(N \log N \cdot L).Merge Sort (Thuật toán Bài mới): Cũng giải quyết tốt bài toán nhờ tính ổn định, độ phức tạp O(N \log N \cdot L). Tuy nhiên, nó tiêu tốn thêm bộ nhớ cho mảng phụ (tmpArr) và chậm hơn std::sort do không được tối ưu ở mức compiler.Kết luận: Xét về tốc độ tuyệt đối, thuật toán của Bài cũ là "vô địch". Xét về độ an toàn và dễ code, dùng std::sort của C++ là tốt nhất. Tự viết Merge Sort như Bài mới nằm ở mức trung bình.
+
+# 2. Các phương thức liên quan:
+Với Bài cũ (Length-Bucketing + MSD Radix Sort) Phân lô theo chiều dài (Length Offset): Thuật toán dùng 2 mảng len_count và len_offset để tính toán chính xác vị trí của từng chuỗi trong mảng sorted_by_len chỉ thông qua độ dài của chúng. Đây là kỹ thuật Prefix-Sum kinh điển, giúp triệt tiêu hoàn toàn việc phải đi so sánh 2 chuỗi lệch độ dài. Zero-Copy (Tham chiếu vùng nhớ): Struct StringRef chỉ lưu con trỏ char* s trỏ thẳng vào bộ đệm nhập liệu (in_buf) và độ dài len. Nó không hề tạo ra một bản sao chuỗi nào trong bộ nhớ, tối đa hóa hiệu năng.Tối ưu chặn dưới (Threshold): Dùng Insertion Sort và strcmp khi số lượng phần tử cần đệ quy N < 25.Với Bài mới (Merge Sort)Custom Comparator (isSmaller): Trái tim của bài mới nằm ở hàm này. Nó định tuyến rõ ràng: So sánh .length() trước, nếu khác nhau thì chuỗi ngắn hơn đứng trước. Nếu bằng nhau, nó trả về kết quả của toán tử < (chuẩn so sánh từ điển của std::string).Cơ chế chia để trị (Divide and Conquer): Liên tục chia đôi mảng vector<string> ra cho đến khi còn 1 phần tử, sau đó gọi hàm doMerge để trộn 2 mảng con đã sắp xếp lại với nhau. Cần một mảng tmpArr để hứng dữ liệu tạm.
+
+# 3. tối ưu tiếp tục so với lần 1:
+# + Quản lý bộ nhớ: 
+    - Bài cũ: Zero-copy. Chỉ dùng con trỏ trỏ vào vùng nhớ đệm chung 16MB.
+    - Bài mới: Cấp phát động liên tục bằng std::string và vector.
+    - Đánh giá: Bài cũ hủy diệt Bài mới. Khai báo hàng vạn std::string sẽ khiến HĐH phải cấp phát bộ nhớ rải rác (Heap Allocation), gây nghẽn cổ chai cực nặng và dội Cache Miss liên tục.
+# + I/O (Đọc/Ghi):
+    - Bài cũ: Đọc 1 cục 16MB vào RAM bằng cin.read, tự phân tách thủ công.
+    - Bài mới: Dùng cin >> arr[i] chuẩn của C++.
+    - Đánh giá: Bài cũ nhanh gấp hàng chục lần. Dù Bài mới đã bật cin.tie(0), tốc độ khởi tạo std::string qua toán tử >> vẫn không thể đọ lại việc đọc thô theo block byte.
+# + Thuật toán cốt lõi:
+    - Bài cũ: Nhóm độ dài O(N) + Radix O(W⋅N).
+    - Bài mới: Merge Sort O(NlogN⋅L).
+    - Đánh giá: Bài cũ có Big-O tốt hơn hẳn. Khi N lên đến 105, NlogN bắt đầu bộc lộ sự chậm chạp so với hàm tuyến tính của Radix.
+# + Tính ứng dụng & Bảo trì:
+    - Bài cũ: Cực kỳ khó đọc, khó sửa. Dễ dính lỗi Segfault nếu input dị (ví dụ vượt 16MB).
+    - Bài mới: Code sạch, rõ ràng, dễ bảo trì, dễ hiểu, chạy an toàn với mọi kích thước input.
+    - Đánh giá: Bài mới áp đảo về tính "Con người". Bài mới là mẫu code chuẩn mực khi đi làm thực tế hoặc phỏng vấn, nơi sự trong sáng của logic được đánh giá cao hơn vài mili-giây hiệu năng.
