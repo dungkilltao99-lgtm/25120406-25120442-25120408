@@ -236,29 +236,33 @@ Sự kết hợp giữa đặc tính độ dài và cấu trúc dữ liệu tron
 
 # 1. Thuật toán cài đặt tốt nhất:
 
-Khi đối mặt với bài toán sắp xếp một mảng số nguyên lớn (đặc biệt là trong lập trình thi đấu hoặc xử lý dữ liệu lớn), đây là 3 lựa chọn hàng đầu:Radix Sort (Cơ số 2^{16} = 65536): Đây chính là thuật toán bạn đang dùng. Với số nguyên 32-bit, chia làm 2 lượt đi (2 passes), độ phức tạp là O(N). Nó nhanh hơn rất nhiều so với các thuật toán dựa trên phép so sánh khi N lớn, vì số lượt duyệt cố định là 2 thay vì \log N.std::sort (Introsort - Kết hợp giữa Quick Sort, Heap Sort và Insertion Sort): Thuật toán mặc định của C++. Độ phức tạp O(N \log N). Dù về mặt lý thuyết chậm hơn Radix Sort, nhưng nhờ các công nghệ tối ưu hóa nội tại của compiler (như SIMD, loop unrolling), std::sort vẫn chạy cực kỳ nhanh và là lựa chọn "an toàn" nhất nếu không muốn tự cài đặt.Counting Sort: Độ phức tạp O(N + K) với K là khoảng giá trị của phần tử. Thuật toán này chỉ tốt nhất khi giá trị các phần tử nhỏ (ví dụ A_i \le 10^6). Nếu khoảng giá trị rộng (từ -2 \cdot 10^9 đến 2 \cdot 10^9), Counting Sort hoàn toàn bất khả thi vì tràn bộ nhớ.Kết luận cho Mục 1: Lựa chọn Radix Sort với cơ số 65536 của bạn là tối ưu nhất về mặt tốc độ lý thuyết cho một mảng số nguyên 32-bit ngẫu nhiên diện rộng.
+Đối với bài toán nhập vào một số lượng lớn số nguyên, sắp xếp chúng và xuất ra màn hình dưới áp lực thời gian chạy cực ngắn (Time Limit chặt), các thuật toán tối ưu nhất bao gồm:Radix Sort (Sắp xếp cơ số - Cơ số $2^{16}$): Đây là thuật toán mà bạn đang áp dụng. Thay vì chia theo cơ số 10 hoặc cơ số 2 (dịch từng bit một), việc chia làm 2 lượt xử lý với cơ số $65536$ ($2^{16}$) là lựa chọn tối ưu nhất về mặt tốc độ đối với số nguyên 32-bit. Độ phức tạp thời gian chỉ là $O(2 \cdot N)$ tương đương $O(N)$, nhanh hơn rất nhiều so với $O(N \log N)$ của std::sort (IntroSort).Counting Sort (Sắp xếp đếm): Chỉ tối ưu hơn Radix Sort khi khoảng giá trị của các phần tử (Range) cực kỳ nhỏ. Tuy nhiên, nếu khoảng giá trị rộng (từ số âm lớn đến số dương lớn), Counting Sort sẽ bị quá giới hạn bộ nhớ. Do đó, Radix Sort vẫn là biến thể "vua" ở đây.Thuật toán tối ưu hóa I/O (Fast I/O thủ công): Mặc dù không phải thuật toán sắp xếp, nhưng việc kết hợp Radix Sort với đọc/ghi dữ liệu theo khối (Block) thông qua cin.read() và cout.write() là thuật toán bắt buộc để vượt qua các test case có kích thước dữ liệu hàng chục MB.
 
 # 2. Các phương thức liên quan đến thuật toán chính (Radix Sort):
-Để Radix Sort chạy mượt mà với số nguyên có dấu (signed int), hàm radixSort của bạn phối hợp các kỹ thuật sau:Phép biến đổi Bit Biểu diễn (a[i] ^= 0x80000000): Bản chất của số nguyên có dấu trong máy tính dùng mã bù 2, khiến số âm có bit cao nhất (bit dấu) là 1, còn số dương là 0. Phép ^= 0x80000000 sẽ đảo ngược bit dấu này, biến các số âm thành các số "nhỏ hơn" số dương trong hệ không dấu (unsigned), giúp thuật toán sắp xếp đúng thứ tự. Cuối hàm ta chỉ cần đảo lại một lần nữa.Mảng đếm tần suất (count1, count2 kích thước 65536): Thay vì đếm từng chữ số hệ 10, ta đếm theo cụm 16 bit. 2^{16} = 65536, vừa vặn với một mảng kích thước nhỏ, tối ưu bộ nhớ cache của CPU.Kỹ thuật lấy 16 bit thấp và 16 bit cao:Lượt 1: a[i] & 0xFFFF để trích xuất 16 bit cuối.Lượt 2: (b[i] >> 16) & 0xFFFF để dịch phải và lấy 16 bit đầu.Mảng cộng dồn (Prefix Sum) và phân phối ngược: Tính vị trí bắt đầu của các nhóm số và duyệt ngược từ n - 1 về 0 để đảm bảo tính ổn định (stable sort) của thuật toán.
+Để đạt được hiệu năng tối đa, đoạn code mới đã vận dụng các kỹ thuật lập trình cấp thấp (Low-level) rất tinh tế:Fast I/O bằng Buffer thủ công: Sử dụng một mảng in_buf và out_buf kích thước $1 \text{ MB}$ (1 << 20) để giảm thiểu số lần tương tác trực tiếp với ổ đĩa/hệ điều hành. Đọc một lần cả khối dữ liệu vào RAM rồi tự parse thành số nguyên.Kỹ thuật Bit Manipulation (Thao tác trên Bit):a[i] ^= 0x80000000: Đảo bit dấu để biến các số nguyên có dấu (gồm cả số âm) thành một dãy số không dấu có thứ tự đồng dạng, giúp Radix Sort chạy đúng trên tập số thực tế.Toán tử & 0xFFFF và >> 16: Trích xuất nhanh 16 bit thấp và 16 bit cao của số nguyên mà không cần dùng các phép toán chia (/) hay chia dư (%) vốn rất chậm ở cấp độ CPU.Quản lý bộ nhớ tĩnh (Static Allocation): Khai báo các mảng dữ liệu data_arr và temp_arr ở vùng nhớ toàn cục (BSS Segment) thay vì cấp phát động trên Heap.Ép kiểu con trỏ sang Unsigned (Pointer Casting): Chuyển đổi mảng int* sang unsigned int* để kiểm soát hành vi dịch bit của CPU.
 
 # 3. tối ưu tiếp tục so với lần 1:
-# + Quản lý bộ nhớ (Mảng dữ liệu): 
-    - Bài cũ: Cấp phát động: new int[n]
-    - Bài mới: Mảng toàn cục cố định: int data_arr[100005]
-    - Đánh giá: Bài cũ linh hoạt hơn! Bài mới bị giới hạn cứng N≤105. Nếu đề bài cho N=106, bài mới sẽ bị lỗi tràn mảng (Runtime Error) ngay lập tức.
-# + An toàn phép dịch bit:
-    - Bài cũ: Thao tác trực tiếp trên int có dấu.
-    - Bài mới: Ép kiểu sang unsigned int*.
-    - Đánh giá: Bài mới xuất sắc! Dịch phải (>>) trên số int có dấu có thể kích hoạt arithmetic shift (giữ lại bit dấu), gây sai số. Ép sang unsigned int đảm bảo luôn là logical shift (điền số 0 vào bên trái).
-# + Xử lý tràn số khi in/đọc số âm:
-    - Bài cũ: Dùng int: x = -x;
-    - Bài mới: Dùng long long: lx = -lx;
-    - Đánh giá: Bài mới sửa lỗi chí mạng! Ở bài cũ, nếu số đầu vào là INT_MIN (−2147483648), phép x = -x sẽ gây tràn số nghiêm trọng vì số dương lớn nhất chỉ là 2147483647. Bài mới dùng long long đã triệt tiêu hoàn toàn lỗi này.
-# + Tốc độ thực thi:
-    - Bài cũ: Khá nhanh.
-    - Bài mới: Nhanh hơn một chút ở khâu I/O.
-    - Đánh giá: Việc khai báo mảng toàn cục (bản mới) giúp tiết kiệm vài mili-giây cấp phát vùng nhớ Heap so với  (bản cũ).
- 
+# + Hành vi dịch bit trong Radix Sort: 
+    - Bài cũ: (b[i] >> 16) trên kiểu dữ liệu có dấu (int).
+    - Bài mới: Ép kiểu sang unsigned int*: (b[i] >> 16).
+    - Đánh giá: Tránh lỗi Logic / Undefined Behavior: Trong C++, dịch phải số âm (int) là Implementation-defined (thường là dịch số học - giữ nguyên bit dấu). Khi ép sang unsigned int, CPU sẽ thực hiện dịch logic (điền số 0 vào các bit trống), giúp phép toán trích xuất bit luôn chính xác tuyệt đối trên mọi trình biên dịch.
+# + Sửa lỗi tràn số với số âm lớn nhất (INT_MIN):
+    - Bài cũ: Dùng int trong writeInt(). Đoạn if (x < 0) { x = -x; } sẽ bị tràn số nếu x=−231 (INT_MIN).
+    - Bài mới: Dùng long long lx = x; sau đó mới lấy lx = -lx;.
+    - Đánh giá: Tăng tính chính xác: Trong chuẩn số nguyên 32-bit, số −231 không thể chuyển thành +231 dưới kiểu int vì vượt quá giới hạn dương (INT_MAX là 231−1). Việc nâng lên long long giúp xử lý gọn gàng tất cả các số âm biên mà không sợ bug tràn số hệ thống.
+# + Cấp phát bộ nhớ:
+    - Bài cũ: Sử dụng bộ nhớ động trên Heap:new int[n] và delete[].
+    - Bài mới: Sử dụng bộ nhớ tĩnh toàn cục:int data_arr[100005];
+    - Đánh giá: Tăng tốc độ thực thi: Lệnh new và delete phải yêu cầu hệ điều hành tìm kiếm và cấp phát vùng nhớ tự do trên Heap tại thời điểm chạy (Runtime), gây tốn chi phí (Overhead). Mảng tĩnh được cấp phát ngay khi chương trình nạp vào RAM, giúp tiết kiệm thời gian đáng kể.
+# + Độ an toàn khi Parse dữ liệu:
+    - Bài cũ: Trong readInt(), biến tích lũy x là kiểu int.
+    - Bài mới: Trong readInt(), biến tích lũy x là kiểu long long.
+    - Đánh giá: An toàn dữ liệu: Giúp quá trình nhân cộng tích lũy số (x * 10 + ...) không bị tràn giữa chừng trước khi trả về kết quả ép kiểu cuối cùng.
+ # + Tường minh trong mã nguồn:
+    - Bài cũ: Đặt tên buffer chung chung: buf, buf_pos, buf_len.
+    - Bài mới: Đổi tên tường minh hơn: in_buf, in_pos, in_len.
+    - Đánh giá: Tăng tính scannable và sạch sẽ của code: Giúp phân biệt rõ ràng đâu là buffer nhập (in), đâu là buffer xuất (out), tránh nhầm lẫn khi bảo trì code.
+    
 ## B: Lexicographic Sort
 
 # 1. Thuật toán cài đặt tốt nhất:
