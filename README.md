@@ -1,6 +1,6 @@
 # Tên môn: Cấu trúc dữ liệu và giải thuật
 
-# Thời gian học: HK2 2025-2026
+# Thời gian học: HK2 03/2026 - 07/2026
 
 # Họ tên sinh viên: 
 
