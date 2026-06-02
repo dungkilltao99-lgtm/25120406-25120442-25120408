@@ -78,7 +78,7 @@ int main(int argc, char* argv[]) {
             a[i] = i;
         }
         for (int i = 2; i < MAX_N; i++) {
-            swap(a[i], a[i / 2]);
+            my_swap(a[i], a[i / 2]);
         }
         for (int i = 0; i < MAX_N; i++) {
             if (a[i] % 2 == 0) a[i] = a[i] * 10000;
